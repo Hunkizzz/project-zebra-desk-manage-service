@@ -1,11 +1,14 @@
-package ru.deloitte.controller;
+package team.projectzebra.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import ru.deloitte.persistence.Repository.PlaceRepository;
-import ru.deloitte.persistence.entity.Place;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import team.projectzebra.persistence.Repository.PlaceRepository;
+import team.projectzebra.persistence.entity.Place;
 
 @RestController
 @RequestMapping("/api/v1/place")
