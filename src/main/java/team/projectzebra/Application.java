@@ -1,4 +1,4 @@
-package ru.deloitte;
+package team.projectzebra;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

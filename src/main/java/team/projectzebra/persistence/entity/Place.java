@@ -1,4 +1,4 @@
-package ru.deloitte.persistence.entity;
+package team.projectzebra.persistence.entity;
 
 import javax.persistence.*;
 
