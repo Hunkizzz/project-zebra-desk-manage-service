@@ -1,7 +1,7 @@
 spring:
   application:
     name:
-      project-zebra-workplace-reservation-service
+      projectzebrateam-workplace-reservation-service
   cloud:
     config:
       uri: http://rumos0151:8888
