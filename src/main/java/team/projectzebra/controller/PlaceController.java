@@ -11,7 +11,7 @@ import team.projectzebra.persistence.Repository.PlaceRepository;
 import team.projectzebra.persistence.entity.Place;
 
 @RestController
-@RequestMapping("/api/v1/projectzebrateam-workplace-reservation-service/place")
+@RequestMapping("/api/v1/projectzebrateam-workplace-reservation-service")
 public class PlaceController {
     PlaceRepository placeRepo;
     @Autowired
@@ -19,13 +19,13 @@ public class PlaceController {
         this.placeRepo = placeRepo;
     }
 
-    @RequestMapping("/get-all")
+    @RequestMapping("/workplaces")
     public String greeting() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(placeRepo.findAll());
     }
 
-    @PostMapping(path="/add-new") // Map ONLY POST Requests
+    @PostMapping(path="/workplaces") // Map ONLY POST Requests
     void addNewPlace (@RequestParam String location
             , @RequestParam boolean isBusy) {
 
