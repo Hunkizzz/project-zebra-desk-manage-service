@@ -11,7 +11,7 @@ import team.projectzebra.persistence.Repository.PlaceRepository;
 import team.projectzebra.persistence.entity.Place;
 
 @RestController
-@RequestMapping("/api/v1/place")
+@RequestMapping("/api/v1/projectzebrateam-workplace-reservation-service/place")
 public class PlaceController {
     PlaceRepository placeRepo;
     @Autowired
