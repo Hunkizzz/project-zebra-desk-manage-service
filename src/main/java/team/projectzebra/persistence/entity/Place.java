@@ -15,7 +15,7 @@ public class Place {
 
     public Place() {
     }
-    
+
 
     public Place(String place, boolean isBusy) {
         this.location = place;
