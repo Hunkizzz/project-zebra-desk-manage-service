@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "place")
-public class Place {
+public class Workplace {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -13,10 +13,10 @@ public class Place {
 
     private boolean isBusy;
 
-    public Place() {
+    public Workplace() {
     }
 
-    public Place(String place, boolean isBusy) {
+    public Workplace(String place, boolean isBusy) {
         this.location = place;
         this.isBusy = isBusy;
     }
