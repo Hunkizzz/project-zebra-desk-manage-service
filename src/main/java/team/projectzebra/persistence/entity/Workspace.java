@@ -26,7 +26,7 @@ public class Workspace {
 
     @ApiModelProperty(notes = "The workspaceMeta uuid")
     @OneToOne
-    @JoinColumn(name = "workspace_uuid")
+    @JoinColumn(name = "workspace_meta_uuid")
     private WorkspaceMeta workspaceMeta;
 
     @ApiModelProperty(notes = "The workspace state")

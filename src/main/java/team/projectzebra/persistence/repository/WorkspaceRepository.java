@@ -24,7 +24,7 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, UUID> {
             "Select 'Total' as state, count(*) FROM workspace;", nativeQuery = true)
     List<WorkspaceDTO> getInfoAboutPlaces();
 
-    @Query(value = "SELECT new team.projectzebra.dao.ReservationLogDAO(w.uuid, wm.buildingCompany) from Workspace w left join WorkspaceMeta wm on wm.uuid = workspace_uuid where w.uuid = :uuid")
+    @Query(value = "SELECT new team.projectzebra.dao.ReservationLogDAO(w.uuid, wm.buildingCompany) from Workspace w left join WorkspaceMeta wm on wm.uuid = workspace_meta_uuid where w.uuid = :uuid")
     ReservationLogDAO getInfoForReservationLog(@Param("uuid") UUID uuid);
 
     @Modifying

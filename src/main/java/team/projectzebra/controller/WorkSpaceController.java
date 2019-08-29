@@ -58,7 +58,7 @@ public class WorkSpaceController {
         return objectMapper.writeValueAsString(workspaceRepository.getInfoAboutPlaces());
     }
     @ApiOperation(value = "Set state of workspace")
-//    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping(path = "/workspaces")
     // Map ONLY POST Requests
     ResponseEntity reserveSpace(@RequestParam UUID workspaceUUID) throws ResourceNotFoundException {
