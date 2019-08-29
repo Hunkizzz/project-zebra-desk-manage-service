@@ -12,6 +12,8 @@ import team.projectzebra.dto.WorkspaceDTO;
 import team.projectzebra.persistence.entity.Workspace;
 
 public interface WorkspaceRepository extends JpaRepository<Workspace, UUID> {
+    Workspace findByUuid(UUID uuid);
+
     @Query(value = "SELECT 'Free' as state, count(busy) as count FROM workspace w where busy = false\n" +
             "\n" +
             "UNION ALL\n" +

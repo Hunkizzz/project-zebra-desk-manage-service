@@ -1,13 +1,13 @@
 package team.projectzebra.persistence.entity;
 
-import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import io.swagger.annotations.ApiModelProperty;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+
 import lombok.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -16,10 +16,11 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class Company {
+    @ApiModelProperty(notes = "The Java generated company uuid")
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID uuid;
-
+    @ApiModelProperty(notes = "The company name")
     @NotNull
     private String name;
 }
