@@ -2,6 +2,9 @@ package team.projectzebra.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,12 +45,19 @@ public class WorkSpaceController {
         this.reservationLogRepository = reservationLogRepository;
     }
 
+    @ApiOperation(value = "View info about free and busy workspaces")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved info"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
+    })
     @RequestMapping("/workspaces")
     public String greeting() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(workspaceRepository.getInfoAboutPlaces());
     }
-
+    @ApiOperation(value = "Set state of workspace")
     @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping(path = "/workspaces")
     // Map ONLY POST Requests
