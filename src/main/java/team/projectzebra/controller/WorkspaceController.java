@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import team.projectzebra.dao.ReservationLogDAO;
+import team.projectzebra.dao.reservationLogDao;
 import team.projectzebra.persistence.entity.ReservationLog;
 import team.projectzebra.persistence.entity.Workspace;
 import team.projectzebra.persistence.repository.CompanyRepository;
@@ -25,17 +25,17 @@ import team.projectzebra.persistence.repository.WorkspaceRepository;
 import team.projectzebra.util.exceptions.ResourceNotFoundException;
 
 @RestController
-@RequestMapping("/api/v1/projectzebrateam-workplace-reservation-service")
-public class WorkSpaceController {
+@RequestMapping("/api/v1/projectzebrateam-workspace-reservation-service")
+public class WorkspaceController {
     WorkspaceRepository workspaceRepository;
     CompanyRepository companyRepository;
     WorkspaceMetaRepository workspaceMetaRepository;
     ReservationLogRepository reservationLogRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkSpaceController.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkspaceController.class);
 
     @Autowired
-    public WorkSpaceController(WorkspaceRepository workspaceRepository,
+    public WorkspaceController(WorkspaceRepository workspaceRepository,
                                CompanyRepository companyRepository,
                                WorkspaceMetaRepository workspaceMetaRepository,
                                ReservationLogRepository reservationLogRepository) {
@@ -55,7 +55,7 @@ public class WorkSpaceController {
     @RequestMapping("/workspaces")
     public String greeting() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(workspaceRepository.getInfoAboutPlaces());
+        return objectMapper.writeValueAsString(workspaceRepository.getInfoAboutWorkspaces());
     }
     @ApiOperation(value = "Set state of workspace")
     @CrossOrigin(origins = "http://localhost:4200")
@@ -70,12 +70,12 @@ public class WorkSpaceController {
 
         final Workspace updatedWorkspace = workspaceRepository.save(workspace);
 
-        ReservationLogDAO reservationLogDAO = workspaceRepository.getInfoForReservationLog(workspaceUUID);
+        reservationLogDao reservationLogDao = workspaceRepository.getInfoForReservationLog(workspaceUUID);
 
-        if (reservationLogDAO != null) {
+        if (reservationLogDao != null) {
             ReservationLog reservationLog = ReservationLog.builder()
-                    .companyBuildingUUID(reservationLogDAO.getBuildingCompany().getUuid())
-                    .workspaceUUID(reservationLogDAO.getWorkspaceUUID()).build();
+                    .companyBuildingUUID(reservationLogDao.getBuildingCompany().getUuid())
+                    .workspaceUUID(reservationLogDao.getWorkspaceUUID()).build();
             reservationLogRepository.save(reservationLog);
             logger.info("Workspace {} was updated", workspaceUUID.toString());
         }

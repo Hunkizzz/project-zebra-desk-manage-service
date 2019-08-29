@@ -31,4 +31,7 @@ public class Workspace {
 
     @ApiModelProperty(notes = "The workspace state")
     private boolean busy;
+
+    @ApiModelProperty(notes = "The workspace internal id")
+    private String internalId;
 }
