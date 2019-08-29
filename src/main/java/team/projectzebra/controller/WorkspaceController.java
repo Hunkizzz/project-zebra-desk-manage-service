@@ -16,12 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import team.projectzebra.dao.reservationLogDao;
+import team.projectzebra.dto.WorkspaceStatus;
 import team.projectzebra.persistence.entity.ReservationLog;
 import team.projectzebra.persistence.entity.Workspace;
 import team.projectzebra.persistence.repository.CompanyRepository;
 import team.projectzebra.persistence.repository.ReservationLogRepository;
 import team.projectzebra.persistence.repository.WorkspaceMetaRepository;
 import team.projectzebra.persistence.repository.WorkspaceRepository;
+import team.projectzebra.rabbitmq.Producer;
 import team.projectzebra.util.exceptions.ResourceNotFoundException;
 
 @RestController
@@ -31,6 +33,7 @@ public class WorkspaceController {
     CompanyRepository companyRepository;
     WorkspaceMetaRepository workspaceMetaRepository;
     ReservationLogRepository reservationLogRepository;
+    Producer producer;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkspaceController.class);
 
@@ -38,11 +41,13 @@ public class WorkspaceController {
     public WorkspaceController(WorkspaceRepository workspaceRepository,
                                CompanyRepository companyRepository,
                                WorkspaceMetaRepository workspaceMetaRepository,
-                               ReservationLogRepository reservationLogRepository) {
+                               ReservationLogRepository reservationLogRepository,
+                               Producer producer) {
         this.workspaceRepository = workspaceRepository;
         this.companyRepository = companyRepository;
         this.workspaceMetaRepository = workspaceMetaRepository;
         this.reservationLogRepository = reservationLogRepository;
+        this.producer = producer;
     }
 
     @ApiOperation(value = "View info about free and busy workspaces")
@@ -57,10 +62,11 @@ public class WorkspaceController {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(workspaceRepository.getInfoAboutWorkspaces());
     }
+
     @ApiOperation(value = "Set state of workspace")
     @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping(path = "/workspaces")
-    // Map ONLY POST Requests
+        // Map ONLY POST Requests
     ResponseEntity reserveSpace(@RequestParam UUID workspaceUUID) throws ResourceNotFoundException {
         Workspace workspace = workspaceRepository.findByUuid(workspaceUUID);
         if (workspace == null) {
@@ -69,7 +75,7 @@ public class WorkspaceController {
         workspace.setBusy(!workspace.isBusy());
 
         final Workspace updatedWorkspace = workspaceRepository.save(workspace);
-
+        producer.sendMessage(new WorkspaceStatus(workspace.getInternalId(), workspace.isBusy()));
         reservationLogDao reservationLogDao = workspaceRepository.getInfoForReservationLog(workspaceUUID);
 
         if (reservationLogDao != null) {
