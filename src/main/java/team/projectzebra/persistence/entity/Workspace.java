@@ -1,14 +1,18 @@
 package team.projectzebra.persistence.entity;
 
 import io.swagger.annotations.ApiModelProperty;
+import java.util.UUID;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import java.util.UUID;
 import lombok.Setter;
 
 @Data
@@ -30,4 +34,8 @@ public class Workspace {
 
     @ApiModelProperty(notes = "The workspace state")
     private boolean busy;
+
+    @ApiModelProperty(notes = "The workspace internal id")
+    private String internalId;
+
 }
