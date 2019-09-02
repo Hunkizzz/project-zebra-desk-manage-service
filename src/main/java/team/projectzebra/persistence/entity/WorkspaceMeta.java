@@ -1,5 +1,6 @@
 package team.projectzebra.persistence.entity;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.NotNull;
 import lombok.*;
@@ -37,13 +38,16 @@ public class WorkspaceMeta {
     @Enumerated(EnumType.STRING)
     private WorkspaceType type;
 
-    @ApiModelProperty(notes = "The workspaceMeta relation pin (if required)")
+    @ApiModelProperty(notes = "The workspaceMeta uuid")
     @OneToOne
-    @JoinColumn(name="require_pin")
-    private WorkspacePin requirePin;
+    @JoinColumn(name = "workspace_uuid")
+    private Workspace workspace;
 
-    @ApiModelProperty(notes = "The workspaceMeta project uuid (if required)")
-    @Column(name="project_uuid")
-    private UUID projectUUID;
+    @Column(name = "access_pin")
+    private String accessPin;
 
+    @ApiModelProperty(notes = "Optional row, if workspace is associated with projeсt.")
+    @ManyToOne
+    @JoinColumn(name = "project_uuid")
+    Project project;
 }

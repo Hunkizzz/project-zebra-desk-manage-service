@@ -24,10 +24,9 @@ public class Workspace {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID uuid;
 
-    @ApiModelProperty(notes = "The workspaceMeta uuid")
-    @OneToOne
-    @JoinColumn(name = "workspace_meta_uuid")
-    private WorkspaceMeta workspaceMeta;
+    @ApiModelProperty(notes = "The workspace internal id")
+    @Column(name = "internal_id")
+    private Long internalId;
 
     @ApiModelProperty(notes = "The workspace state")
     private boolean busy;
