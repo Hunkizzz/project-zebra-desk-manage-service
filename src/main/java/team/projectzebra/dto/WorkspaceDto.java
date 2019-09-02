@@ -1,6 +1,6 @@
 package team.projectzebra.dto;
 
-public interface WorkspaceDTO {
+public interface WorkspaceDto {
     String getState();
     Integer getCount();
 }

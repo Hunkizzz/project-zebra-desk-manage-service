@@ -7,11 +7,11 @@ import team.projectzebra.persistence.entity.BuildingCompany;
 
 @Getter
 @Setter
-public class ReservationLogDAO {
+public class reservationLogDao {
    private UUID workspaceUUID;
    private BuildingCompany buildingCompany;
 
-   public ReservationLogDAO(UUID workspaceUUID, BuildingCompany buildingCompany){
+   public reservationLogDao(UUID workspaceUUID, BuildingCompany buildingCompany){
        this.buildingCompany = buildingCompany;
        this.workspaceUUID = workspaceUUID;
    }
