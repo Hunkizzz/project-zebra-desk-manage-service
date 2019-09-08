@@ -2,6 +2,7 @@ package team.projectzebra.persistence.entity;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.util.UUID;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,15 +29,14 @@ public class Workspace {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID uuid;
 
-    @ApiModelProperty(notes = "The workspaceMeta uuid")
+    @ApiModelProperty(notes = "The workspace internal id")
+    @Column(name = "internal_id")
+    private String internalId;
+
     @OneToOne
-    @JoinColumn(name = "workspace_uuid")
+    @JoinColumn(name = "workspace_meta_uuid")
     private WorkspaceMeta workspaceMeta;
 
     @ApiModelProperty(notes = "The workspace state")
     private boolean busy;
-
-    @ApiModelProperty(notes = "The workspace internal id")
-    private String internalId;
-
 }

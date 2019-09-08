@@ -26,11 +26,11 @@ public class ReservationLog {
 
     @ApiModelProperty(notes = "The relation between company and building uuid")
     @Column(name = "company_building_uuid")
-    private UUID companyBuildingUUID;
+    private UUID companyBuildingUuid;
 
     @ApiModelProperty(notes = "The workspace uuid")
     @Column(name = "workspace_uuid")
-    private UUID workspaceUUID;
+    private UUID workspaceUuid;
 
     @PrePersist
     protected void onCreate() {
