@@ -20,6 +20,7 @@ import team.projectzebra.persistence.repository.CompanyRepository;
 import team.projectzebra.persistence.repository.ReservationLogRepository;
 import team.projectzebra.persistence.repository.WorkspaceMetaRepository;
 import team.projectzebra.persistence.repository.WorkspaceRepository;
+import team.projectzebra.rabbitmq.Producer;
 import team.projectzebra.util.exceptions.ResourceNotFoundException;
 
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +32,7 @@ public class WorkspaceController {
     CompanyRepository companyRepository;
     WorkspaceMetaRepository workspaceMetaRepository;
     ReservationLogRepository reservationLogRepository;
+    Producer producer;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkspaceController.class);
 
@@ -38,11 +40,13 @@ public class WorkspaceController {
     public WorkspaceController(WorkspaceRepository workspaceRepository,
                                CompanyRepository companyRepository,
                                WorkspaceMetaRepository workspaceMetaRepository,
-                               ReservationLogRepository reservationLogRepository) {
+                               ReservationLogRepository reservationLogRepository,
+                               Producer producer) {
         this.workspaceRepository = workspaceRepository;
         this.companyRepository = companyRepository;
         this.workspaceMetaRepository = workspaceMetaRepository;
         this.reservationLogRepository = reservationLogRepository;
+        this.producer = producer;
     }
 
     @ApiOperation(value = "View info about free and busy workspaces")
