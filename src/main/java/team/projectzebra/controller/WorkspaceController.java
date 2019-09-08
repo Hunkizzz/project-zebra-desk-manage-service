@@ -129,7 +129,7 @@ public class WorkspaceController {
         final Workspace updatedWorkspace = workspaceRepository.save(workspace);
         producer.sendMessage(new WorkspaceStatus(workspace.getInternalId(), workspace.isBusy()));
         ReservationLogDao reservationLogDao = workspaceRepository.getInfoForReservationLog(workspace.getUuid());
-        
+
         if (reservationLogDao != null) {
             ReservationLog reservationLog = ReservationLog.builder()
                     .companyBuildingUuid(reservationLogDao.getBuildingCompany().getUuid())
