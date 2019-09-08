@@ -42,6 +42,7 @@ public class WorkspaceMeta {
     @JoinColumn(name = "workspace_uuid")
     private Workspace workspace;
 
+    @ApiModelProperty(notes = "The workspaceMeta pin (if required)")
     @Column(name = "access_pin")
     private String accessPin;
 
