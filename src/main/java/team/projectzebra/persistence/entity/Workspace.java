@@ -33,6 +33,10 @@ public class Workspace {
     @Column(name = "internal_id")
     private String internalId;
 
+    @OneToOne
+    @JoinColumn(name = "workspace_meta_uuid")
+    private WorkspaceMeta workspaceMeta;
+
     @ApiModelProperty(notes = "The workspace state")
     private boolean busy;
 }

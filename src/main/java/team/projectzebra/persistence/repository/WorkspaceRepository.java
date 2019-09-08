@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-import team.projectzebra.dao.reservationLogDao;
+import team.projectzebra.dao.ReservationLogDao;
 import team.projectzebra.dto.WorkspaceDto;
 import team.projectzebra.persistence.entity.Workspace;
 
@@ -25,7 +25,7 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, UUID> {
     List<WorkspaceDto> getInfoAboutWorkspaces();
 
     @Query(value = "SELECT new team.projectzebra.dao.reservationLogDao(w.uuid, wm.buildingCompany) from Workspace w left join WorkspaceMeta wm on wm.uuid = workspace_uuid where w.uuid = :uuid")
-    reservationLogDao getInfoForReservationLog(@Param("uuid") UUID uuid);
+    ReservationLogDao getInfoForReservationLog(@Param("uuid") UUID uuid);
 
     @Modifying
     @Transactional

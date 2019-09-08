@@ -16,7 +16,6 @@ import team.projectzebra.enums.WorkspaceType;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkspaceMeta {
-    @ApiModelProperty(notes = "The Java generated workspaceMeta uuid")
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID uuid;
