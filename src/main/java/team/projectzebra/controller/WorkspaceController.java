@@ -64,7 +64,7 @@ public class WorkspaceController {
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
-    @GetMapping("/workspaces")
+    @GetMapping(path = "/workspaces")
     public ResponseEntity<WorkspaceInfoDto> getWorkspaceForUuid(@RequestParam UUID workspaceUuid) throws ResourceNotFoundException {
         Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
         if (workspace == null) {
