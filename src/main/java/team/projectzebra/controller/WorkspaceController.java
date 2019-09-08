@@ -113,7 +113,7 @@ public class WorkspaceController {
 
     @ApiOperation(value = "Set state of workspace")
     @PostMapping(path = "/workspaces", params = {"workspaceUuid", "pin"})
-        // Map ONLY POST Requests
+    // Map ONLY POST Requests
     ResponseEntity<Workspace> reserveRestrictedSpace(@RequestParam UUID workspaceUuid, @RequestParam String pin, HttpServletResponse response) throws ResourceNotFoundException {
         Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
         if (workspace == null) {
