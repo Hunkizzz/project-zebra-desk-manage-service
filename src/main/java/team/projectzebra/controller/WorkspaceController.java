@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team.projectzebra.dao.ReservationLogDao;
 import team.projectzebra.dto.WorkspaceInfoDto;
+import team.projectzebra.dto.WorkspaceStatus;
 import team.projectzebra.enums.WorkspaceType;
 import team.projectzebra.persistence.entity.ReservationLog;
 import team.projectzebra.persistence.entity.Workspace;
@@ -128,7 +129,7 @@ public class WorkspaceController {
         final Workspace updatedWorkspace = workspaceRepository.save(workspace);
 
         ReservationLogDao reservationLogDao = workspaceRepository.getInfoForReservationLog(workspace.getUuid());
-
+        producer.sendMessage(new WorkspaceStatus(workspace.getInternalId(), workspace.isBusy()));
         if (reservationLogDao != null) {
             ReservationLog reservationLog = ReservationLog.builder()
                     .companyBuildingUuid(reservationLogDao.getBuildingCompany().getUuid())
