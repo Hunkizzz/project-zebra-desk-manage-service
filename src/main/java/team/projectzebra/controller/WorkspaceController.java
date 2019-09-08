@@ -127,9 +127,9 @@ public class WorkspaceController {
 
     private ResponseEntity<Workspace> updateWorkspace(Workspace workspace, HttpServletResponse response) {
         final Workspace updatedWorkspace = workspaceRepository.save(workspace);
-
-        ReservationLogDao reservationLogDao = workspaceRepository.getInfoForReservationLog(workspace.getUuid());
         producer.sendMessage(new WorkspaceStatus(workspace.getInternalId(), workspace.isBusy()));
+        ReservationLogDao reservationLogDao = workspaceRepository.getInfoForReservationLog(workspace.getUuid());
+        
         if (reservationLogDao != null) {
             ReservationLog reservationLog = ReservationLog.builder()
                     .companyBuildingUuid(reservationLogDao.getBuildingCompany().getUuid())
