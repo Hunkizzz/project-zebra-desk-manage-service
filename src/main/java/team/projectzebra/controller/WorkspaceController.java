@@ -111,7 +111,7 @@ public class WorkspaceController {
     @ApiOperation(value = "Set state of workspace")
     @PostMapping(path = "/workspaces", params = {"workspaceUuid", "pin", "confirmation"})
         // Map ONLY POST Requests
-    ResponseEntity<WorkspaceInfoDto> reserveRestrictedSpace(@RequestParam UUID workspaceUuid, @RequestParam String pin, @RequestParam Boolean confirmation, HttpServletResponse response) throws ResourceNotFoundException, ValidationFailedException {
+    ResponseEntity<WorkspaceInfoDto> reserveRestrictedSpace(@RequestParam UUID workspaceUuid, @RequestParam String pin, @RequestParam Boolean confirmation, HttpServletResponse response) throws Exception {
         Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
         if (workspace == null) {
             throw new ResourceNotFoundException("Workspace not found for this uuid: " + workspaceUuid);
@@ -123,6 +123,8 @@ public class WorkspaceController {
                     throw new ValidationFailedException("Wrong pin for this workspace: " + workspaceUuid);
                 }
             }
+        } else {
+            throw new Exception("No confirmation: " + workspaceUuid);
         }
         workspace.setBusy(!workspace.isBusy());
         return updateWorkspace(workspace, response);
