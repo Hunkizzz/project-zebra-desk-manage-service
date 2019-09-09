@@ -1,18 +1,17 @@
 package team.projectzebra.dao;
 
 import java.util.UUID;
+
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import team.projectzebra.persistence.entity.BuildingCompany;
 
-@Getter
-@Setter
+@Data
 public class ReservationLogDao {
-   private UUID workspaceUuid;
-   private BuildingCompany buildingCompany;
+    private UUID workspaceUuid;
 
-   public ReservationLogDao(UUID workspaceUuid, BuildingCompany buildingCompany){
-       this.buildingCompany = buildingCompany;
-       this.workspaceUuid = workspaceUuid;
-   }
+    public ReservationLogDao(UUID workspaceUUID) {
+        this.workspaceUuid = workspaceUUID;
+    }
 }
+

@@ -19,18 +19,14 @@ public class ReservationLog {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID uuid;
 
+    @ApiModelProperty(notes = "The workspace uuid")
+    @Column(name = "workspace_uuid")
+    private UUID workspaceUuid;
+
     @ApiModelProperty(notes = "The Java generated reservationLog date when row was created")
     @Column(name = "created_at", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     public Date createdAt;
-
-    @ApiModelProperty(notes = "The relation between company and building uuid")
-    @Column(name = "company_building_uuid")
-    private UUID companyBuildingUuid;
-
-    @ApiModelProperty(notes = "The workspace uuid")
-    @Column(name = "workspace_uuid")
-    private UUID workspaceUuid;
 
     @PrePersist
     protected void onCreate() {
