@@ -1,16 +1,13 @@
 package team.projectzebra.persistence.entity;
 
 import io.swagger.annotations.ApiModelProperty;
-import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -33,4 +30,8 @@ public class Building {
     private String street;
     @ApiModelProperty(notes = "The building number")
     private String building;
+    @ApiModelProperty(notes = "The company")
+    @OneToOne
+    @JoinColumn(name = "company")
+    private Company company;
 }

@@ -5,6 +5,6 @@ package team.projectzebra.enums;
  */
 public enum  WorkspaceType {
     GENERAL,
-    RESTRICTED,
-    PROJECT,
+    MGR,
+    PIN,
 }
