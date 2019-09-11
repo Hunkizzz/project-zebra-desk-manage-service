@@ -41,7 +41,7 @@ import team.projectzebra.util.exceptions.ValidationFailedException;
 
 @Api(value = "Workspaces Booking Management System")
 @RestController
-@RequestMapping("/api/v1/projectzebrateam-workplace-reservation-service")
+@RequestMapping("/api/v1/projectzebrateam-workspace-reservation-service")
 public class WorkspaceController {
     WorkspaceRepository workspaceRepository;
     CompanyRepository companyRepository;
