@@ -41,7 +41,7 @@ import team.projectzebra.util.exceptions.ValidationFailedException;
 
 @Api(value = "Workspaces Booking Management System")
 @RestController
-@RequestMapping("/api/v1/projectzebrateam-workplace-reservation-service")
+@RequestMapping("/api/v1/projectzebrateam-workspace-reservation-service")
 public class WorkspaceController {
     WorkspaceRepository workspaceRepository;
     CompanyRepository companyRepository;
@@ -97,37 +97,37 @@ public class WorkspaceController {
     }
 
     @ApiOperation(value = "Set state of workspace")
-    @PostMapping(path = "/workspaces", params = {"workspaceUuid", "confirmation"})
+    @PostMapping(path = "/workspaces", params = {"workspaceUuid", "confirm"})
         // Map ONLY POST Requests
-    ResponseEntity<WorkspaceInfoDto> reserveSpace(@RequestParam UUID workspaceUuid, @RequestParam Boolean confirmation, HttpServletResponse response) throws Exception {
+    ResponseEntity<WorkspaceInfoDto> reserveSpace(@RequestParam UUID workspaceUuid, @RequestParam Boolean confirm, HttpServletResponse response) throws Exception {
         Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
         if (workspace == null) {
             throw new ResourceNotFoundException("Workspace not found for this uuid :: " + workspaceUuid);
         }
-        if (!confirmation) {
-            throw new Exception("No confirmation: " + workspaceUuid);
+        if (!confirm) {
+            throw new Exception("No confirm: " + workspaceUuid);
         }
         workspace.setBusy(!workspace.isBusy());
         return updateWorkspace(workspace, response);
     }
 
     @ApiOperation(value = "Set state of workspace")
-    @PostMapping(path = "/workspaces", params = {"workspaceUuid", "pin", "confirmation"})
+    @PostMapping(path = "/workspaces", params = {"workspaceUuid", "pin", "confirm"})
         // Map ONLY POST Requests
-    ResponseEntity<WorkspaceInfoDto> reserveRestrictedSpace(@RequestParam UUID workspaceUuid, @RequestParam String pin, @RequestParam Boolean confirmation, HttpServletResponse response) throws Exception {
+    ResponseEntity<WorkspaceInfoDto> reserveRestrictedSpace(@RequestParam UUID workspaceUuid, @RequestParam String pin, @RequestParam Boolean confirm, HttpServletResponse response) throws Exception {
         Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
         if (workspace == null) {
             throw new ResourceNotFoundException("Workspace not found for this uuid: " + workspaceUuid);
         }
         List<WorkspaceRestriction> workspaceRestrictions = workspaceRestrictionRepository.findByWorkspaceUuid(workspaceUuid);
-        if (confirmation) {
+        if (confirm) {
             for (WorkspaceRestriction workspaceRestriction : workspaceRestrictions) {
                 if (workspaceRestriction.getType() == WorkspaceType.PIN && !workspaceRestriction.getValue().equals(pin)) {
                     throw new ValidationFailedException("Wrong pin for this workspace: " + workspaceUuid);
                 }
             }
         } else {
-            throw new Exception("No confirmation: " + workspaceUuid);
+            throw new Exception("No confirm: " + workspaceUuid);
         }
         workspace.setBusy(!workspace.isBusy());
         return updateWorkspace(workspace, response);
