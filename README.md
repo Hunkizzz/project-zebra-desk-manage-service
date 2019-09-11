@@ -1,1 +1,1 @@
-# project-zebra-desk-server
+# project-zebra-workspace-reservation-service
