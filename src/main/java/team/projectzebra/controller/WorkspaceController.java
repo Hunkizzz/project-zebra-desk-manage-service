@@ -72,22 +72,27 @@ public class WorkspaceController {
     }
 
     @GetMapping(name = "/workspaces", params = {"workspaceUuid"})
-    public ResponseEntity<WorkspaceInfoDto> getWorkspaceForUuid(@RequestParam UUID workspaceUuid) throws ResourceNotFoundException {
+    public ResponseEntity<WorkspaceInfoDto> getWorkspaceForUuid(@RequestParam UUID workspaceUuid, HttpServletResponse response) throws ResourceNotFoundException {
         Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
         if (workspace == null) {
             throw new ResourceNotFoundException("Workspace not found for this uuid :: " + workspaceUuid);
         }
-        List<WorkspaceRestriction> workspaceRestrictions = workspaceRestrictionRepository.findByWorkspaceUuid(workspaceUuid);
-        WorkspaceInfoDto workspaceInfoDto = new WorkspaceInfoDto(
-                workspace.getUuid(),
-                workspace.getInternalId(),
-                workspaceRestrictions.
-                        stream().
-                        map(WorkspaceRestriction::getType).
-                        collect(Collectors.toList()),
-                workspace.isBusy(),
-                !workspace.isBusy());
-        return ResponseEntity.ok(workspaceInfoDto);
+        if (!workspace.isBusy()) {
+            List<WorkspaceRestriction> workspaceRestrictions = workspaceRestrictionRepository.findByWorkspaceUuid(workspaceUuid);
+            WorkspaceInfoDto workspaceInfoDto = new WorkspaceInfoDto(
+                    workspace.getUuid(),
+                    workspace.getInternalId(),
+                    workspaceRestrictions.
+                            stream().
+                            map(WorkspaceRestriction::getType).
+                            collect(Collectors.toList()),
+                    workspace.isBusy(),
+                    !workspace.isBusy());
+            return ResponseEntity.ok(workspaceInfoDto);
+        } else {
+            workspace.setBusy(!workspace.isBusy());
+            return updateWorkspace(workspace, response);
+        }
     }
 
     @ApiOperation(value = "Set state of workspace")
