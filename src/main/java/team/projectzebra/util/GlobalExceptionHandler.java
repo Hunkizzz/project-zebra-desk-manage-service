@@ -27,6 +27,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({ValidationFailedException.class})
     public ResponseEntity<?> validationFailedException(ValidationFailedException ex, WebRequest request){
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
     }
 }
