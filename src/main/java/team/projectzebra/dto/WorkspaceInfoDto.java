@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class WorkspaceInfoDto {
     private UUID workspaceUuid;
-    private String workspaceInternalId;
+    private String internalId;
     private List<WorkspaceType> restrictions;
     private boolean workspaceReserved;
     private boolean workspaceFree;
