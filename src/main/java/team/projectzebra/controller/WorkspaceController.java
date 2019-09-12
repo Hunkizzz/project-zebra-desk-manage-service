@@ -66,12 +66,12 @@ public class WorkspaceController {
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
     })
-    @RequestMapping(name = "/workspaces", params = {})
+    @RequestMapping(path = "/workspaces", params = {})
     public ResponseEntity<List<WorkspaceDto>> greeting() throws JsonProcessingException {
         return ResponseEntity.ok(workspaceRepository.getInfoAboutPlaces());
     }
 
-    @GetMapping(name = "/workspaces", params = {"workspaceUuid"})
+    @GetMapping(path = "/workspaces", params = {"workspaceUuid"})
     public ResponseEntity<WorkspaceInfoDto> getWorkspaceForUuid(@RequestParam UUID workspaceUuid, HttpServletResponse response) throws ResourceNotFoundException {
         Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
         if (workspace == null) {
