@@ -68,7 +68,6 @@ public class WorkspaceController {
     })
     @RequestMapping(name = "/workspaces", params = {})
     public ResponseEntity<List<WorkspaceDto>> greeting() throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
         return ResponseEntity.ok(workspaceRepository.getInfoAboutPlaces());
     }
 
