@@ -77,7 +77,7 @@ public class WorkspaceController {
         return objectMapper.writeValueAsString(workspaceRepository.getInfoAboutPlaces());
     }
 
-    @GetMapping("/workspaces")
+    @GetMapping(name = "/workspaces", params = {"workspaceUuid"})
     public ResponseEntity<WorkspaceInfoDto> getWorkspaceForUuid(@RequestParam UUID workspaceUuid) throws ResourceNotFoundException {
         Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
         if (workspace == null) {
