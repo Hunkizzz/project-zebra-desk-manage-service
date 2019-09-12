@@ -7,12 +7,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import java.util.stream.Collectors;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -20,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import team.projectzebra.dao.ReservationLogDao;
+import team.projectzebra.dto.WorkspaceDto;
 import team.projectzebra.dto.WorkspaceInfoDto;
 import team.projectzebra.dto.WorkspaceStatus;
 import team.projectzebra.enums.WorkspaceType;
@@ -68,10 +66,10 @@ public class WorkspaceController {
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
     })
-    @RequestMapping("/workspaces")
-    public String greeting() throws JsonProcessingException {
+    @RequestMapping(name = "/workspaces", params = {})
+    public ResponseEntity<List<WorkspaceDto>> greeting() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(workspaceRepository.getInfoAboutPlaces());
+        return ResponseEntity.ok(workspaceRepository.getInfoAboutPlaces());
     }
 
     @GetMapping(name = "/workspaces", params = {"workspaceUuid"})
