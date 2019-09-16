@@ -1,7 +1,6 @@
 package team.projectzebra.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -18,9 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import team.projectzebra.dto.WorkspaceDto;
 import team.projectzebra.dto.WorkspaceInfoDto;
 import team.projectzebra.dto.WorkspaceStatus;
+import team.projectzebra.dto.WorkspaceSummaryInfo;
 import team.projectzebra.enums.WorkspaceType;
 import team.projectzebra.persistence.entity.ReservationLog;
 import team.projectzebra.persistence.entity.Workspace;
@@ -67,8 +66,30 @@ public class WorkspaceController {
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
     })
     @RequestMapping(path = "/workspaces", params = {})
-    public ResponseEntity<List<WorkspaceDto>> greeting() throws JsonProcessingException {
-        return ResponseEntity.ok(workspaceRepository.getInfoAboutPlaces());
+    public ResponseEntity<WorkspaceSummaryInfo> getSummaryInfo() throws JsonProcessingException {
+        WorkspaceSummaryInfo workspaceSummaryInfo = new WorkspaceSummaryInfo();
+        workspaceRepository.getInfoAboutPlaces().forEach(option -> {
+            switch (option.getOption()) {
+                case "Total":
+                    workspaceSummaryInfo.setTotal(option.getCount());
+                    break;
+                case "Busy":
+                    workspaceSummaryInfo.setBusy(option.getCount());
+                    break;
+                case "MGR":
+                    workspaceSummaryInfo.setManager(option.getCount());
+                    break;
+                case "Equipped":
+                    workspaceSummaryInfo.setEquipped(option.getCount());
+                    break;
+                case "Free":
+                    workspaceSummaryInfo.setFree(option.getCount());
+                    break;
+                default:
+                    break;
+            }
+        });
+        return ResponseEntity.ok(workspaceSummaryInfo);
     }
 
     @GetMapping(path = "/workspaces", params = {"workspaceUuid"})
