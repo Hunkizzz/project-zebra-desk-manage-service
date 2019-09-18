@@ -34,5 +34,7 @@ public class Workspace {
     private String name;
 
     @ApiModelProperty(notes = "The workspace status")
+    @NotNull
+    @Enumerated(EnumType.STRING)
     private WorkspaceStatus status;
 }
