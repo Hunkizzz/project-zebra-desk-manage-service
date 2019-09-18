@@ -2,6 +2,7 @@ package team.projectzebra.persistence.entity;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import team.projectzebra.enums.WorkspaceStatus;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -32,8 +33,8 @@ public class Workspace {
     @NotNull
     private String name;
 
-    @ApiModelProperty(notes = "The workspace state")
-    private boolean busy;
+    @ApiModelProperty(notes = "The workspace status")
+    private WorkspaceStatus status;
 
     @ApiModelProperty(notes = "")
     private boolean equipped;
