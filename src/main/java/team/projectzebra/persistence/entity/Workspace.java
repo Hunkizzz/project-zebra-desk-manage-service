@@ -35,7 +35,4 @@ public class Workspace {
 
     @ApiModelProperty(notes = "The workspace status")
     private WorkspaceStatus status;
-
-    @ApiModelProperty(notes = "")
-    private boolean equipped;
 }
