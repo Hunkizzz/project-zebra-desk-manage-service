@@ -42,7 +42,7 @@ public class WorkspaceController {
     CompanyRepository companyRepository;
     ReservationLogRepository reservationLogRepository;
     WorkspaceRestrictionRepository workspaceRestrictionRepository;
-    Producer producer;
+//    Producer producer;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkspaceController.class);
 
@@ -50,13 +50,15 @@ public class WorkspaceController {
     public WorkspaceController(WorkspaceRepository workspaceRepository,
                                CompanyRepository companyRepository,
                                ReservationLogRepository reservationLogRepository,
-                               WorkspaceRestrictionRepository workspaceRestrictionRepository,
-                               Producer producer) {
+                               WorkspaceRestrictionRepository workspaceRestrictionRepository
+//            ,
+//                               Producer producer
+    ) {
         this.workspaceRepository = workspaceRepository;
         this.companyRepository = companyRepository;
         this.reservationLogRepository = reservationLogRepository;
         this.workspaceRestrictionRepository = workspaceRestrictionRepository;
-        this.producer = producer;
+//        this.producer = producer;
     }
 
     @ApiOperation(value = "View info about free and busy workspaces")
@@ -156,7 +158,7 @@ public class WorkspaceController {
 
     private ResponseEntity<WorkspaceInfoDto> updateWorkspace(Workspace workspace, HttpServletResponse response) {
         final Workspace updatedWorkspace = workspaceRepository.save(workspace);
-        producer.sendMessage(new WorkspaceStatus(workspace.getInternalId(), workspace.getStatus() == WorkspaceState.OCCUPIED));
+//        producer.sendMessage(new WorkspaceStatus(workspace.getInternalId(), workspace.getStatus() == WorkspaceState.OCCUPIED));
         if (workspace != null) {
             ReservationLog reservationLog = ReservationLog
                     .builder()
