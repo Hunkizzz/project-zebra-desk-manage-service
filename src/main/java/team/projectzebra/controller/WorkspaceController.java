@@ -18,9 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team.projectzebra.dto.WorkspaceInfoDto;
-import team.projectzebra.dto.WorkspaceStatus;
-import team.projectzebra.dto.WorkspaceSummaryInfo;
-import team.projectzebra.enums.WorkspaceState;
+import team.projectzebra.dto.WorkspaceSummaryInfoDto;
+import team.projectzebra.enums.WorkspaceStatus;
 import team.projectzebra.enums.WorkspaceType;
 import team.projectzebra.persistence.entity.ReservationLog;
 import team.projectzebra.persistence.entity.Workspace;
@@ -29,7 +28,6 @@ import team.projectzebra.persistence.repository.CompanyRepository;
 import team.projectzebra.persistence.repository.ReservationLogRepository;
 import team.projectzebra.persistence.repository.WorkspaceRepository;
 import team.projectzebra.persistence.repository.WorkspaceRestrictionRepository;
-import team.projectzebra.rabbitmq.Producer;
 import team.projectzebra.util.exceptions.ResourceNotFoundException;
 import team.projectzebra.util.exceptions.ValidationFailedException;
 
@@ -69,30 +67,30 @@ public class WorkspaceController {
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
     })
     @RequestMapping(path = "/workspaces", params = {})
-    public ResponseEntity<WorkspaceSummaryInfo> getSummaryInfo() throws JsonProcessingException {
-        WorkspaceSummaryInfo workspaceSummaryInfo = new WorkspaceSummaryInfo();
+    public ResponseEntity<WorkspaceSummaryInfoDto> getSummaryInfo() throws JsonProcessingException {
+        WorkspaceSummaryInfoDto workspaceSummaryInfoDto = new WorkspaceSummaryInfoDto();
         workspaceRepository.getInfoAboutPlaces().forEach(option -> {
             switch (option.getOption()) {
                 case "Total":
-                    workspaceSummaryInfo.setTotal(option.getCount());
+                    workspaceSummaryInfoDto.setTotal(option.getCount());
                     break;
                 case "Busy":
-                    workspaceSummaryInfo.setBusy(option.getCount());
+                    workspaceSummaryInfoDto.setBusy(option.getCount());
                     break;
                 case "MGR":
-                    workspaceSummaryInfo.setManager(option.getCount());
+                    workspaceSummaryInfoDto.setManager(option.getCount());
                     break;
                 case "Equipped":
-                    workspaceSummaryInfo.setEquipped(option.getCount());
+                    workspaceSummaryInfoDto.setEquipped(option.getCount());
                     break;
                 case "Free":
-                    workspaceSummaryInfo.setFree(option.getCount());
+                    workspaceSummaryInfoDto.setFree(option.getCount());
                     break;
                 default:
                     break;
             }
         });
-        return ResponseEntity.ok(workspaceSummaryInfo);
+        return ResponseEntity.ok(workspaceSummaryInfoDto);
     }
 
     @GetMapping(path = "/workspaces", params = {"workspaceUuid"})
@@ -102,7 +100,7 @@ public class WorkspaceController {
         if (workspace == null) {
             throw new ResourceNotFoundException("Workspace not found for this uuid :: " + workspaceUuid);
         }
-        if (workspace.getStatus() == WorkspaceState.FREE) {
+        if (workspace.getWorkspaceStatus() == WorkspaceStatus.FREE) {
             List<WorkspaceRestriction> workspaceRestrictions =
                     workspaceRestrictionRepository.findByWorkspaceUuid(workspaceUuid);
             WorkspaceInfoDto workspaceInfoDto = new WorkspaceInfoDto(
@@ -112,11 +110,11 @@ public class WorkspaceController {
                             stream().
                             map(WorkspaceRestriction::getType).
                             collect(Collectors.toList()),
-                    true,
-                    false);
+                    workspace.getWorkspaceStatus() == WorkspaceStatus.OCCUPIED,
+                    workspace.getWorkspaceStatus() == WorkspaceStatus.FREE);
             return ResponseEntity.ok(workspaceInfoDto);
         } else {
-            workspace.setStatus(WorkspaceState.OCCUPIED);
+            workspace.setWorkspaceStatus(WorkspaceStatus.FREE);
             return updateWorkspace(workspace, response);
         }
     }
@@ -133,7 +131,7 @@ public class WorkspaceController {
         if (!confirm) {
             throw new Exception("No confirm: " + workspaceUuid);
         }
-        workspace.setStatus(WorkspaceState.OCCUPIED);
+        workspace.setWorkspaceStatus(WorkspaceStatus.OCCUPIED);
         return updateWorkspace(workspace, response);
     }
 
@@ -158,13 +156,13 @@ public class WorkspaceController {
         } else {
             throw new Exception("No confirm: " + workspaceUuid);
         }
-        workspace.setStatus(WorkspaceState.OCCUPIED);
+        workspace.setWorkspaceStatus(WorkspaceStatus.OCCUPIED);
         return updateWorkspace(workspace, response);
     }
 
     private ResponseEntity<WorkspaceInfoDto> updateWorkspace(Workspace workspace, HttpServletResponse response) {
         final Workspace updatedWorkspace = workspaceRepository.save(workspace);
-//        producer.sendMessage(new WorkspaceStatus(workspace.getInternalId(), workspace.getStatus() == WorkspaceState
+//        producer.sendMessage(new WorkspaceStatusDto(workspace.getInternalId(), workspace.getStatus() == WorkspaceState
 //        .OCCUPIED));
         if (workspace != null) {
             ReservationLog reservationLog = ReservationLog
@@ -188,8 +186,8 @@ public class WorkspaceController {
                         stream().
                         map(WorkspaceRestriction::getType).
                         collect(Collectors.toList()),
-                workspace.getStatus() == WorkspaceState.OCCUPIED,
-                workspace.getStatus() == WorkspaceState.FREE);
+                workspace.getWorkspaceStatus() == WorkspaceStatus.OCCUPIED,
+                workspace.getWorkspaceStatus() == WorkspaceStatus.FREE);
         return ResponseEntity.ok(workspaceInfoDto);
     }
 }

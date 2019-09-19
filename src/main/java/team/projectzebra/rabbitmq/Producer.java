@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import team.projectzebra.dto.WorkspaceStatus;
+import team.projectzebra.dto.WorkspaceStatusDto;
 
 @Profile("prod")
 @Component
@@ -41,12 +41,12 @@ public class Producer {
 //        }
 //    }
 
-    public void sendMessage(WorkspaceStatus workspaceStatus) {
+    public void sendMessage(WorkspaceStatusDto workspaceStatusDto) {
         logger.debug("Sending message...");
 
         rabbitTemplate.convertAndSend(
                 workspaceReservationServiceStompExchange,
                 workspaceReservationServiceRoutingKey,
-                workspaceStatus);
+                workspaceStatusDto);
     }
 }

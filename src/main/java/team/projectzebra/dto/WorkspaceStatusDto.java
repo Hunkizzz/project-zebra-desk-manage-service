@@ -3,11 +3,11 @@ package team.projectzebra.dto;
 /**
  * Proudly created by dmaslov on 8/30/19.
  */
-public class WorkspaceStatus {
+public class WorkspaceStatusDto {
     private String internalId;
     private Boolean busy;
 
-    public WorkspaceStatus(String internalId, Boolean busy) {
+    public WorkspaceStatusDto(String internalId, Boolean busy) {
         this.internalId = internalId;
         this.busy = busy;
     }

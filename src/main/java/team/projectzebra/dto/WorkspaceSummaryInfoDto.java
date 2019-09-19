@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class WorkspaceSummaryInfo {
+public class WorkspaceSummaryInfoDto {
     private int total;
     private int manager;
     private int equipped;
