@@ -121,16 +121,16 @@
             </plugin>
         </plugins>
 
-        <resources>
-            <resource>
-                <filtering>true</filtering>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>Dockerfile</include>
-                    <include>bootstrap.yml</include>
-                </includes>
-            </resource>
-        </resources>
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <filtering>true</filtering>-->
+<!--                <directory>src/main/resources</directory>-->
+<!--                <includes>-->
+<!--                    <include>Dockerfile</include>-->
+<!--                    <include>bootstrap.yml</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--        </resources>-->
 
     </build>
 </project>
