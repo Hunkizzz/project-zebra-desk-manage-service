@@ -14,17 +14,13 @@ import java.util.UUID;
 public interface WorkspaceRepository extends JpaRepository<Workspace, UUID> {
     Workspace findByUuid(UUID uuid);
 
-    @Query(value = "SELECT 'Free' as option, count(busy) as count FROM workspace w where busy = false\n" +
+    @Query(value = "SELECT 'Free' as option, count(1) as count FROM workspace w where workspace_status = 'FREE'\n" +
+            "                        UNION ALL\n" +
+            "                        SELECT 'Busy' as option, count(1) FROM workspace where workspace_status = 'OCCUPIED'\n" +
+            "                        UNION ALL\n" +
+            "                       Select 'Total' as option, count(*) FROM workspace\n" +
             "            UNION ALL\n" +
-            "            \n" +
-            "            SELECT 'Busy' as option, count(busy) FROM workspace where busy = true\n" +
-            "            UNION ALL\n" +
-            "            Select 'Total' as option, count(*) FROM workspace\n" +
-            "UNION ALL\n" +
-            "\tSELECT 'MGR' as option, count(*) FROM workspace w LEFT JOIN workspace_restriction  wr on w.uuid = wr.workspace_uuid where wr.type = 'MGR'\n" +
-            "\t\n" +
-            "\tUNION ALL\n" +
-            "\tSELECT 'Equipped' as option, count(*) FROM workspace w where w.equipped = true;", nativeQuery = true)
+            "SELECT 'MGR' as option, count(*) FROM workspace w LEFT JOIN workspace_restriction  wr on w.uuid = wr.workspace_uuid where wr.type = 'MGR'", nativeQuery = true)
     List<WorkspaceDto> getInfoAboutPlaces();
 
 //    @Query(value = "SELECT new team.projectzebra.dao.ReservationLogDao(w.uuid, wm.buildingCompany) from Workspace w left join Floor f on wm.uuid = workspace_meta_uuid where w.uuid = :uuid")
