@@ -1,6 +1,6 @@
 package team.projectzebra.enums;
 
-public enum WorkspaceStatus {
+public enum WorkspaceState {
     OCCUPIED,
     FREE,
     POTENTIALLY_FREE,

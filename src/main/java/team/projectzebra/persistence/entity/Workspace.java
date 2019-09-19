@@ -2,7 +2,7 @@ package team.projectzebra.persistence.entity;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-import team.projectzebra.enums.WorkspaceStatus;
+import team.projectzebra.enums.WorkspaceState;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -36,5 +36,5 @@ public class Workspace {
     @ApiModelProperty(notes = "The workspace status")
     @NotNull
     @Enumerated(EnumType.STRING)
-    private WorkspaceStatus status;
+    private WorkspaceState status;
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import team.projectzebra.dto.WorkspaceInfoDto;
 import team.projectzebra.dto.WorkspaceStatus;
 import team.projectzebra.dto.WorkspaceSummaryInfo;
+import team.projectzebra.enums.WorkspaceState;
 import team.projectzebra.enums.WorkspaceType;
 import team.projectzebra.persistence.entity.ReservationLog;
 import team.projectzebra.persistence.entity.Workspace;
@@ -98,7 +99,7 @@ public class WorkspaceController {
         if (workspace == null) {
             throw new ResourceNotFoundException("Workspace not found for this uuid :: " + workspaceUuid);
         }
-        if (!workspace.isBusy()) {
+        if (workspace.getStatus() == WorkspaceState.FREE) {
             List<WorkspaceRestriction> workspaceRestrictions = workspaceRestrictionRepository.findByWorkspaceUuid(workspaceUuid);
             WorkspaceInfoDto workspaceInfoDto = new WorkspaceInfoDto(
                     workspace.getUuid(),
@@ -107,11 +108,11 @@ public class WorkspaceController {
                             stream().
                             map(WorkspaceRestriction::getType).
                             collect(Collectors.toList()),
-                    workspace.isBusy(),
-                    !workspace.isBusy());
+                    true,
+                    false);
             return ResponseEntity.ok(workspaceInfoDto);
         } else {
-            workspace.setBusy(!workspace.isBusy());
+            workspace.setStatus(WorkspaceState.OCCUPIED);
             return updateWorkspace(workspace, response);
         }
     }
@@ -127,7 +128,7 @@ public class WorkspaceController {
         if (!confirm) {
             throw new Exception("No confirm: " + workspaceUuid);
         }
-        workspace.setBusy(!workspace.isBusy());
+        workspace.setStatus(WorkspaceState.OCCUPIED);
         return updateWorkspace(workspace, response);
     }
 
@@ -149,13 +150,13 @@ public class WorkspaceController {
         } else {
             throw new Exception("No confirm: " + workspaceUuid);
         }
-        workspace.setBusy(!workspace.isBusy());
+        workspace.setStatus(WorkspaceState.OCCUPIED);
         return updateWorkspace(workspace, response);
     }
 
     private ResponseEntity<WorkspaceInfoDto> updateWorkspace(Workspace workspace, HttpServletResponse response) {
         final Workspace updatedWorkspace = workspaceRepository.save(workspace);
-        producer.sendMessage(new WorkspaceStatus(workspace.getInternalId(), workspace.isBusy()));
+        producer.sendMessage(new WorkspaceStatus(workspace.getInternalId(), workspace.getStatus() == WorkspaceState.OCCUPIED));
         if (workspace != null) {
             ReservationLog reservationLog = ReservationLog
                     .builder()
@@ -177,8 +178,8 @@ public class WorkspaceController {
                         stream().
                         map(WorkspaceRestriction::getType).
                         collect(Collectors.toList()),
-                workspace.isBusy(),
-                !workspace.isBusy());
+                workspace.getStatus() == WorkspaceState.OCCUPIED,
+                workspace.getStatus() == WorkspaceState.FREE);
         return ResponseEntity.ok(workspaceInfoDto);
     }
 }
