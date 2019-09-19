@@ -96,13 +96,15 @@ public class WorkspaceController {
     }
 
     @GetMapping(path = "/workspaces", params = {"workspaceUuid"})
-    public ResponseEntity<WorkspaceInfoDto> getWorkspaceForUuid(@RequestParam UUID workspaceUuid, HttpServletResponse response) throws ResourceNotFoundException {
+    public ResponseEntity<WorkspaceInfoDto> getWorkspaceForUuid(@RequestParam UUID workspaceUuid,
+                                                                HttpServletResponse response) throws ResourceNotFoundException {
         Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
         if (workspace == null) {
             throw new ResourceNotFoundException("Workspace not found for this uuid :: " + workspaceUuid);
         }
         if (workspace.getStatus() == WorkspaceState.FREE) {
-            List<WorkspaceRestriction> workspaceRestrictions = workspaceRestrictionRepository.findByWorkspaceUuid(workspaceUuid);
+            List<WorkspaceRestriction> workspaceRestrictions =
+                    workspaceRestrictionRepository.findByWorkspaceUuid(workspaceUuid);
             WorkspaceInfoDto workspaceInfoDto = new WorkspaceInfoDto(
                     workspace.getUuid(),
                     workspace.getInternalId(),
@@ -122,7 +124,8 @@ public class WorkspaceController {
     @ApiOperation(value = "Set state of workspace")
     @PostMapping(path = "/workspaces", params = {"workspaceUuid", "confirm"})
         // Map ONLY POST Requests
-    ResponseEntity<WorkspaceInfoDto> reserveSpace(@RequestParam UUID workspaceUuid, @RequestParam Boolean confirm, HttpServletResponse response) throws Exception {
+    ResponseEntity<WorkspaceInfoDto> reserveSpace(@RequestParam UUID workspaceUuid, @RequestParam Boolean confirm,
+                                                  HttpServletResponse response) throws Exception {
         Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
         if (workspace == null) {
             throw new ResourceNotFoundException("Workspace not found for this uuid :: " + workspaceUuid);
@@ -137,12 +140,15 @@ public class WorkspaceController {
     @ApiOperation(value = "Set state of workspace")
     @PostMapping(path = "/workspaces", params = {"workspaceUuid", "pin", "confirm"})
         // Map ONLY POST Requests
-    ResponseEntity<WorkspaceInfoDto> reserveRestrictedSpace(@RequestParam UUID workspaceUuid, @RequestParam String pin, @RequestParam Boolean confirm, HttpServletResponse response) throws Exception {
+    ResponseEntity<WorkspaceInfoDto> reserveRestrictedSpace(@RequestParam UUID workspaceUuid,
+                                                            @RequestParam String pin, @RequestParam Boolean confirm,
+                                                            HttpServletResponse response) throws Exception {
         Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
         if (workspace == null) {
             throw new ResourceNotFoundException("Workspace not found for this uuid: " + workspaceUuid);
         }
-        List<WorkspaceRestriction> workspaceRestrictions = workspaceRestrictionRepository.findByWorkspaceUuid(workspaceUuid);
+        List<WorkspaceRestriction> workspaceRestrictions =
+                workspaceRestrictionRepository.findByWorkspaceUuid(workspaceUuid);
         if (confirm) {
             for (WorkspaceRestriction workspaceRestriction : workspaceRestrictions) {
                 if (workspaceRestriction.getType() == WorkspaceType.PIN && !workspaceRestriction.getValue().equals(pin)) {
@@ -158,7 +164,8 @@ public class WorkspaceController {
 
     private ResponseEntity<WorkspaceInfoDto> updateWorkspace(Workspace workspace, HttpServletResponse response) {
         final Workspace updatedWorkspace = workspaceRepository.save(workspace);
-//        producer.sendMessage(new WorkspaceStatus(workspace.getInternalId(), workspace.getStatus() == WorkspaceState.OCCUPIED));
+//        producer.sendMessage(new WorkspaceStatus(workspace.getInternalId(), workspace.getStatus() == WorkspaceState
+//        .OCCUPIED));
         if (workspace != null) {
             ReservationLog reservationLog = ReservationLog
                     .builder()
@@ -172,7 +179,8 @@ public class WorkspaceController {
 //        cookie.setHttpOnly(true);
 //        cookie.setMaxAge(60 * 60 * 24);
 //        response.addCookie(cookie);
-        List<WorkspaceRestriction> workspaceRestrictions = workspaceRestrictionRepository.findByWorkspaceUuid(workspace.getUuid());
+        List<WorkspaceRestriction> workspaceRestrictions =
+                workspaceRestrictionRepository.findByWorkspaceUuid(workspace.getUuid());
         WorkspaceInfoDto workspaceInfoDto = new WorkspaceInfoDto(
                 workspace.getUuid(),
                 workspace.getInternalId(),
