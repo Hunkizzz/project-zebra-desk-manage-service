@@ -27,7 +27,6 @@ public class WorkspaceAccessibility {
     private Workspace workspace;
 
     @ApiModelProperty(notes = "The workspace restriction type")
-    @Column(name = "type", length = 25)
     @NotNull
     @Enumerated(EnumType.STRING)
     private WorkspaceAccess accessible;
