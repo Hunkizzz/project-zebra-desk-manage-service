@@ -26,8 +26,8 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, UUID> {
 //    @Query(value = "SELECT new team.projectzebra.dao.ReservationLogDao(w.uuid, wm.buildingCompany) from Workspace w left join Floor f on wm.uuid = workspace_meta_uuid where w.uuid = :uuid")
 //    ReservationLogDao getInfoForReservationLog(@Param("uuid") UUID uuid);
 
-    @Modifying
-    @Transactional
-    @Query(value = "update Workspace set busy = case when busy = true then false else true end where uuid = :uuid")
-    int setStatusForWorkspace(@Param("uuid") UUID uuid);
+//    @Modifying
+//    @Transactional
+//    @Query(value = "update Workspace set busy = case when busy = true then false else true end where uuid = :uuid")
+//    int setStatusForWorkspace(@Param("uuid") UUID uuid);
 }
