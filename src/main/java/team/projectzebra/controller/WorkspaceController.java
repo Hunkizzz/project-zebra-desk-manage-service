@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team.projectzebra.dto.WorkspaceInfoDto;
+import team.projectzebra.dto.WorkspaceStatusDto;
 import team.projectzebra.dto.WorkspaceSummaryInfoDto;
 import team.projectzebra.enums.WorkspaceStatus;
 import team.projectzebra.enums.WorkspaceType;
@@ -28,6 +29,7 @@ import team.projectzebra.persistence.repository.CompanyRepository;
 import team.projectzebra.persistence.repository.ReservationLogRepository;
 import team.projectzebra.persistence.repository.WorkspaceRepository;
 import team.projectzebra.persistence.repository.WorkspaceRestrictionRepository;
+import team.projectzebra.rabbitmq.Producer;
 import team.projectzebra.util.exceptions.ResourceNotFoundException;
 import team.projectzebra.util.exceptions.ValidationFailedException;
 
@@ -40,7 +42,7 @@ public class WorkspaceController {
     CompanyRepository companyRepository;
     ReservationLogRepository reservationLogRepository;
     WorkspaceRestrictionRepository workspaceRestrictionRepository;
-//    Producer producer;
+    Producer producer;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkspaceController.class);
 
@@ -48,15 +50,13 @@ public class WorkspaceController {
     public WorkspaceController(WorkspaceRepository workspaceRepository,
                                CompanyRepository companyRepository,
                                ReservationLogRepository reservationLogRepository,
-                               WorkspaceRestrictionRepository workspaceRestrictionRepository
-//            ,
-//                               Producer producer
-    ) {
+                               WorkspaceRestrictionRepository workspaceRestrictionRepository,
+                               Producer producer) {
         this.workspaceRepository = workspaceRepository;
         this.companyRepository = companyRepository;
         this.reservationLogRepository = reservationLogRepository;
         this.workspaceRestrictionRepository = workspaceRestrictionRepository;
-//        this.producer = producer;
+        this.producer = producer;
     }
 
     @ApiOperation(value = "View info about free and busy workspaces")
@@ -80,9 +80,9 @@ public class WorkspaceController {
                 case "MGR":
                     workspaceSummaryInfoDto.setManager(option.getCount());
                     break;
-                case "Equipped":
-                    workspaceSummaryInfoDto.setEquipped(option.getCount());
-                    break;
+//                case "Equipped":
+//                    workspaceSummaryInfoDto.setEquipped(option.getCount());
+//                    break;
                 case "Free":
                     workspaceSummaryInfoDto.setFree(option.getCount());
                     break;
@@ -162,8 +162,8 @@ public class WorkspaceController {
 
     private ResponseEntity<WorkspaceInfoDto> updateWorkspace(Workspace workspace, HttpServletResponse response) {
         final Workspace updatedWorkspace = workspaceRepository.save(workspace);
-//        producer.sendMessage(new WorkspaceStatusDto(workspace.getInternalId(), workspace.getStatus() == WorkspaceState
-//        .OCCUPIED));
+        producer.sendMessage(new WorkspaceStatusDto(workspace.getInternalId(),
+                workspace.getWorkspaceStatus() == WorkspaceStatus.OCCUPIED));
         if (workspace != null) {
             ReservationLog reservationLog = ReservationLog
                     .builder()

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class WorkspaceSummaryInfoDto {
     private int total;
     private int manager;
-    private int equipped;
+//    private int equipped;
     private int busy;
     private int free;
 }
