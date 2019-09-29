@@ -1,11 +1,8 @@
 package team.projectzebra.persistence.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
-import team.projectzebra.dto.WorkspaceDto;
+import team.projectzebra.dto.InfoDto;
 import team.projectzebra.persistence.entity.Workspace;
 
 import java.util.List;
@@ -21,7 +18,7 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, UUID> {
             "                       Select 'Total' as option, count(*) FROM workspace\n" +
             "            UNION ALL\n" +
             "SELECT 'MGR' as option, count(*) FROM workspace w LEFT JOIN workspace_restriction  wr on w.uuid = wr.workspace_uuid where wr.type = 'MGR'", nativeQuery = true)
-    List<WorkspaceDto> getInfoAboutPlaces();
+    List<InfoDto> getInfoAboutPlaces();
 
 //    @Query(value = "SELECT new team.projectzebra.dao.ReservationLogDao(w.uuid, wm.buildingCompany) from Workspace w left join Floor f on wm.uuid = workspace_meta_uuid where w.uuid = :uuid")
 //    ReservationLogDao getInfoForReservationLog(@Param("uuid") UUID uuid);

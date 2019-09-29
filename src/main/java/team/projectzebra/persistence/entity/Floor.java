@@ -22,7 +22,9 @@ public class Floor {
     private UUID uuid;
 
     @ApiModelProperty(notes = "The floor")
-    private int floor;
+    private String name;
+
+    private String commonName;
 
     @ApiModelProperty(notes = "Optional row, if workspace is associated with projeсt.")
     @ManyToOne

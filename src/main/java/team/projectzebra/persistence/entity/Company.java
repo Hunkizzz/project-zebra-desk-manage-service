@@ -11,8 +11,8 @@ import java.util.UUID;
 @Entity
 @Builder(toBuilder = true)
 @Table(name = "company")
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Company {
     @ApiModelProperty(notes = "The Java generated company uuid")
     @Id

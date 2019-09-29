@@ -38,4 +38,5 @@ public class Building {
     private String street;
     @ApiModelProperty(notes = "The building number")
     private String number;
+
 }

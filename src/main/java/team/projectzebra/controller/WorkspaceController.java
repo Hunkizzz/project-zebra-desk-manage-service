@@ -17,19 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import team.projectzebra.dto.WorkspaceInfoDto;
-import team.projectzebra.dto.WorkspaceStatusDto;
-import team.projectzebra.dto.WorkspaceSummaryInfoDto;
+import team.projectzebra.dto.*;
 import team.projectzebra.enums.WorkspaceStatus;
 import team.projectzebra.enums.WorkspaceType;
-import team.projectzebra.persistence.entity.ReservationLog;
-import team.projectzebra.persistence.entity.Workspace;
-import team.projectzebra.persistence.entity.WorkspaceRestriction;
-import team.projectzebra.persistence.repository.CompanyRepository;
-import team.projectzebra.persistence.repository.ReservationLogRepository;
-import team.projectzebra.persistence.repository.WorkspaceRepository;
-import team.projectzebra.persistence.repository.WorkspaceRestrictionRepository;
-import team.projectzebra.rabbitmq.Producer;
+import team.projectzebra.persistence.entity.*;
+import team.projectzebra.persistence.repository.*;
 import team.projectzebra.util.exceptions.ResourceNotFoundException;
 import team.projectzebra.util.exceptions.ValidationFailedException;
 
@@ -42,7 +34,11 @@ public class WorkspaceController {
     CompanyRepository companyRepository;
     ReservationLogRepository reservationLogRepository;
     WorkspaceRestrictionRepository workspaceRestrictionRepository;
-    Producer producer;
+    BuildingRepository buildingRepository;
+    FloorRepository floorRepository;
+    WorkspaceAccessibilityRepository workspaceAccessibilityRepository;
+    WorkspaceEquipmentRepository workspaceEquipmentRepository;
+//    Producer producer;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkspaceController.class);
 
@@ -51,12 +47,21 @@ public class WorkspaceController {
                                CompanyRepository companyRepository,
                                ReservationLogRepository reservationLogRepository,
                                WorkspaceRestrictionRepository workspaceRestrictionRepository,
-                               Producer producer) {
+                               BuildingRepository buildingRepository,
+                               FloorRepository floorRepository,
+                               WorkspaceEquipmentRepository workspaceEquipmentRepository,
+                               WorkspaceAccessibilityRepository workspaceAccessibilityRepository
+//                               Producer producer
+    ) {
         this.workspaceRepository = workspaceRepository;
         this.companyRepository = companyRepository;
         this.reservationLogRepository = reservationLogRepository;
         this.workspaceRestrictionRepository = workspaceRestrictionRepository;
-        this.producer = producer;
+        this.buildingRepository = buildingRepository;
+        this.floorRepository = floorRepository;
+        this.workspaceAccessibilityRepository = workspaceAccessibilityRepository;
+        this.workspaceEquipmentRepository = workspaceEquipmentRepository;
+//        this.producer = producer;
     }
 
     @ApiOperation(value = "View info about free and busy workspaces")
@@ -160,10 +165,95 @@ public class WorkspaceController {
         return updateWorkspace(workspace, response);
     }
 
+
+    //Block for add info in db
+    @ApiOperation(value = "Add company")
+    @PostMapping(path = "/add-company", params = {"name"})
+    // Map ONLY POST Requests
+    ResponseEntity<Company> addCompany(@RequestParam String name,
+                                       HttpServletResponse response) throws Exception {
+        Company company = Company.builder().name(name).build();
+        companyRepository.save(company);
+        return ResponseEntity.ok(company);
+    }
+
+    @ApiOperation(value = "Add building")
+    @PostMapping(path = "/add-building")
+        // Map ONLY POST Requests
+    ResponseEntity<Building> addBuilding(@RequestBody BuildingDto buildingDto,
+                                         HttpServletResponse response) throws Exception {
+        Company company = companyRepository.findById((UUID.fromString(buildingDto.getCompanyUuid()))).get();
+        Building building = Building.builder().company(company).
+                name(buildingDto.getName()).
+                capacity(buildingDto.getCapacity()).
+                zip(buildingDto.getZip()).
+                stateProvince(buildingDto.getStateProvince()).
+                city(buildingDto.getCity()).
+                street(buildingDto.getStreet()).
+                number(buildingDto.getNumber()).build();
+
+        buildingRepository.save(building);
+        return ResponseEntity.ok(building);
+    }
+
+    @ApiOperation(value = "Add floor")
+    @PostMapping(path = "/add-floor")
+        // Map ONLY POST Requests
+    ResponseEntity<Floor> addFloor(@RequestBody FloorDto floorDto,
+                                   HttpServletResponse response) throws Exception {
+        Building building = buildingRepository.findById((UUID.fromString(floorDto.getBuildingUuid()))).get();
+        Floor floor = Floor.builder().building(building).
+                name(floorDto.getName()).
+                commonName(floorDto.getCommonName()).build();
+
+        floorRepository.save(floor);
+        return ResponseEntity.ok(floor);
+    }
+
+    @ApiOperation(value = "Add workspace")
+    @PostMapping(path = "/add-workspace")
+        // Map ONLY POST Requests
+    ResponseEntity<String> addWorkspace(@RequestBody List<WorkspaceDto> workspaceDtos,
+                                       HttpServletResponse response) throws Exception {
+        workspaceDtos.forEach(workspaceDto -> {
+            Floor floor = floorRepository.findById(UUID.fromString(workspaceDto.getFloorUuid())).get();
+            Workspace workspace = Workspace.builder().floor(floor).
+                    internalId(workspaceDto.getInternalId()).
+                    name(workspaceDto.getName()).
+                    workspaceStatus(workspaceDto.getWorkspaceStatus()).build();
+            workspaceRepository.save(workspace);
+            workspaceDto.getWorkspaceRestrictionDtos().forEach(workspaceRestrictionDto -> {
+                WorkspaceRestriction workspaceRestriction = WorkspaceRestriction.builder().workspace(workspace).
+                        type(workspaceRestrictionDto.getType()).
+                        value(workspaceRestrictionDto.getValue()).build();
+                workspaceRestrictionRepository.save(workspaceRestriction);
+            });
+
+            workspaceDto.getWorkspaceEquipmentDtos().forEach(workspaceEquipmentDto -> {
+                WorkspaceEquipment workspaceEquipment = WorkspaceEquipment.builder().workspace(workspace).
+                        type(workspaceEquipmentDto.getType()).
+                        value(workspaceEquipmentDto.getValue()).build();
+                workspaceEquipmentRepository.save(workspaceEquipment);
+            });
+
+            workspaceDto.getWorkspaceAccessibilityDtos().forEach(workspaceAccessibilityDto -> {
+                WorkspaceAccessibility workspaceAccessibility = WorkspaceAccessibility.builder().workspace(workspace).
+                        accessible(workspaceAccessibilityDto.getAccessible()).build();
+                workspaceAccessibilityRepository.save(workspaceAccessibility);
+            });
+
+        });
+
+        return ResponseEntity.ok("Okey");
+    }
+
+
+    //End
+
     private ResponseEntity<WorkspaceInfoDto> updateWorkspace(Workspace workspace, HttpServletResponse response) {
         final Workspace updatedWorkspace = workspaceRepository.save(workspace);
-        producer.sendMessage(new WorkspaceStatusDto(workspace.getInternalId(),
-                workspace.getWorkspaceStatus() == WorkspaceStatus.OCCUPIED));
+//        producer.sendMessage(new WorkspaceStatusDto(workspace.getInternalId(),
+//                workspace.getWorkspaceStatus() == WorkspaceStatus.OCCUPIED));
         if (workspace != null) {
             ReservationLog reservationLog = ReservationLog
                     .builder()

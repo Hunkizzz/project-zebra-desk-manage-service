@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import team.projectzebra.dto.WorkspaceStatusDto;
-
+@Profile("prod")
 @Component
 public class Producer {
     private static final Logger logger = LoggerFactory.getLogger(Producer.class);
