@@ -6,17 +6,33 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
+import org.apache.batik.anim.dom.SVGDOMImplementation;
+import org.apache.batik.bridge.*;
+import org.apache.batik.gvt.GraphicsNode;
+import org.apache.batik.util.XMLResourceDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.svg.SVGDocument;
+import org.xml.sax.SAXException;
 import team.projectzebra.dto.*;
 import team.projectzebra.enums.WorkspaceStatus;
 import team.projectzebra.enums.WorkspaceType;
@@ -214,7 +230,7 @@ public class WorkspaceController {
     @PostMapping(path = "/add-workspace")
         // Map ONLY POST Requests
     ResponseEntity<String> addWorkspace(@RequestBody List<WorkspaceDto> workspaceDtos,
-                                       HttpServletResponse response) throws Exception {
+                                        HttpServletResponse response) throws Exception {
         workspaceDtos.forEach(workspaceDto -> {
             Floor floor = floorRepository.findById(UUID.fromString(workspaceDto.getFloorUuid())).get();
             Workspace workspace = Workspace.builder().floor(floor).
@@ -249,6 +265,32 @@ public class WorkspaceController {
 
 
     //End
+
+    //Work with SVG
+    @GetMapping(path = "/test-image")
+    public void testImage() throws IOException, ParserConfigurationException, SAXException {
+        Map<String, GraphicsNode> svgCache = new HashMap<String, GraphicsNode>();
+
+        String fileName = "/test.svg";
+        URL resource = WorkspaceController.class.getResource(fileName);
+        String test = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(String.valueOf(resource)).toString();
+        GraphicsNode found;
+        try {
+            String xmlParser = XMLResourceDescriptor.getXMLParserClassName();
+            SAXSVGDocumentFactory df = new SAXSVGDocumentFactory(xmlParser);
+            SVGDocument doc = df.createSVGDocument(resource.toString());
+            UserAgent userAgent = new UserAgentAdapter();
+            DocumentLoader loader = new DocumentLoader(userAgent);
+            BridgeContext ctx = new BridgeContext(userAgent, loader);
+            ctx.setDynamicState(BridgeContext.DYNAMIC);
+            GVTBuilder builder = new GVTBuilder();
+            found = builder.build(ctx, doc);
+            System.out.println("spdgjosdighosg");
+        } catch (Exception e) {
+            System.err.println("getSVGImage error: " + fileName);
+            e.printStackTrace(System.err);
+        }
+    }
 
     private ResponseEntity<WorkspaceInfoDto> updateWorkspace(Workspace workspace, HttpServletResponse response) {
         final Workspace updatedWorkspace = workspaceRepository.save(workspace);
