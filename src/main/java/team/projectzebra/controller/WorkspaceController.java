@@ -6,14 +6,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +19,11 @@ import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.anim.dom.SVGDOMImplementation;
 import org.apache.batik.bridge.*;
 import org.apache.batik.gvt.GraphicsNode;
+import org.apache.batik.transcoder.Transcoder;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.svg2svg.SVGTranscoder;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +54,7 @@ public class WorkspaceController {
     FloorRepository floorRepository;
     WorkspaceAccessibilityRepository workspaceAccessibilityRepository;
     WorkspaceEquipmentRepository workspaceEquipmentRepository;
+    ImageRepository imageRepository;
 //    Producer producer;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkspaceController.class);
@@ -66,7 +67,8 @@ public class WorkspaceController {
                                BuildingRepository buildingRepository,
                                FloorRepository floorRepository,
                                WorkspaceEquipmentRepository workspaceEquipmentRepository,
-                               WorkspaceAccessibilityRepository workspaceAccessibilityRepository
+                               WorkspaceAccessibilityRepository workspaceAccessibilityRepository,
+                               ImageRepository imageRepository
 //                               Producer producer
     ) {
         this.workspaceRepository = workspaceRepository;
@@ -77,6 +79,7 @@ public class WorkspaceController {
         this.floorRepository = floorRepository;
         this.workspaceAccessibilityRepository = workspaceAccessibilityRepository;
         this.workspaceEquipmentRepository = workspaceEquipmentRepository;
+        this.imageRepository = imageRepository;
 //        this.producer = producer;
     }
 
@@ -269,27 +272,69 @@ public class WorkspaceController {
     //Work with SVG
     @GetMapping(path = "/test-image")
     public void testImage() throws IOException, ParserConfigurationException, SAXException {
-        Map<String, GraphicsNode> svgCache = new HashMap<String, GraphicsNode>();
-
-        String fileName = "/test.svg";
-        URL resource = WorkspaceController.class.getResource(fileName);
-        String test = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(String.valueOf(resource)).toString();
-        GraphicsNode found;
+        String inputURI = "";
         try {
+            URL url = TranscoderInput.class.getResource("/floorplan.svg");
             String xmlParser = XMLResourceDescriptor.getXMLParserClassName();
-            SAXSVGDocumentFactory df = new SAXSVGDocumentFactory(xmlParser);
-            SVGDocument doc = df.createSVGDocument(resource.toString());
-            UserAgent userAgent = new UserAgentAdapter();
-            DocumentLoader loader = new DocumentLoader(userAgent);
-            BridgeContext ctx = new BridgeContext(userAgent, loader);
-            ctx.setDynamicState(BridgeContext.DYNAMIC);
-            GVTBuilder builder = new GVTBuilder();
-            found = builder.build(ctx, doc);
-            System.out.println("spdgjosdighosg");
-        } catch (Exception e) {
-            System.err.println("getSVGImage error: " + fileName);
-            e.printStackTrace(System.err);
+            SAXSVGDocumentFactory documentFactory = new SAXSVGDocumentFactory(xmlParser);
+            SVGDocument doc = documentFactory.createSVGDocument(url.toString());
+            org.w3c.dom.Element root = doc.getDocumentElement();
+            //* set the transcoder input and output *
+            TranscoderInput input = new TranscoderInput(doc);
+            ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+//            TranscoderOutput output = new TranscoderOutput(ostream)
+
+            TranscoderOutput output = new TranscoderOutput(new BufferedWriter(new OutputStreamWriter(ostream, "UTF-8")));
+            Transcoder t = new SVGTranscoder();
+            t.transcode(input, output);
+
+            //* perform the transcoding *
+            ostream.flush();
+            ostream.close();
+
+            byte[] name = Base64.getEncoder().encode(ostream.toString().getBytes());
+            byte[] decodedString = Base64.getDecoder().decode(new String(name).getBytes("UTF-8"));
+            System.out.println(new String(decodedString));
+            //* perform the transcoding *
+            ostream.flush();
+            ostream.close();
+            boolean test = Arrays.equals(ostream.toByteArray(), decodedString);
+            Image image = Image.builder().image(decodedString).build();
+            imageRepository.save(image);
+        } catch (IOException | TranscoderException ex) {
+            ex.printStackTrace();
+            throw new IllegalArgumentException(inputURI);
         }
+    }
+
+    @GetMapping(path = "/test-image-get")
+    public void testGetImage() throws IOException, ParserConfigurationException, SAXException, TranscoderException {
+       Image image = imageRepository.findById(UUID.fromString("770bace6-0e34-4a1a-a3ce-1f795d29f961")).get();
+
+        String result = new String(image.getImage());
+
+        // Encode data on your side using BASE64
+        byte[] bytesEncoded = Base64.getEncoder().encode(result.getBytes());
+
+        URL url = TranscoderInput.class.getResource("/floorplan.svg");
+        String xmlParser = XMLResourceDescriptor.getXMLParserClassName();
+        SAXSVGDocumentFactory documentFactory = new SAXSVGDocumentFactory(xmlParser);
+        SVGDocument doc = documentFactory.createSVGDocument(url.toString());
+        org.w3c.dom.Element root = doc.getDocumentElement();
+        //* set the transcoder input and output *
+        TranscoderInput input = new TranscoderInput(doc);
+        ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+//            TranscoderOutput output = new TranscoderOutput(ostream)
+
+        TranscoderOutput output = new TranscoderOutput(new BufferedWriter(new OutputStreamWriter(ostream, "UTF-8")));
+        Transcoder t = new SVGTranscoder();
+        t.transcode(input, output);
+
+        //* perform the transcoding *
+        ostream.flush();
+        ostream.close();
+        byte[] name = Base64.getEncoder().encode(ostream.toString().getBytes());
+        System.out.println(Arrays.equals(name, bytesEncoded));
     }
 
     private ResponseEntity<WorkspaceInfoDto> updateWorkspace(Workspace workspace, HttpServletResponse response) {
